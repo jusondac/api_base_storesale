@@ -1,133 +1,271 @@
 {
-    "version": "1.0",
-    "collections": [
-      {
-        "name": "API v1",
-        "requests": [
+  "info": {
+    "_postman_id": "d0b13c79-941b-4fef-a712-7e34c9e908cd",
+    "name": "API v1 Endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Get Products",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:3000/api/v1/products",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "v1",
+            "products"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get Product by ID",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:3000/api/v1/products/1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "v1",
+            "products",
+            "1"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Create Product",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "http://localhost:3000/api/v1/products",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "v1",
+            "products"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"product\": {\"name\": \"New Product\",\"price\": 20.5,\"quantity\": 100,\"category_id\": 1}}"
+        },
+        "header": [
           {
-            "name": "Get Products",
-            "method": "GET",
-            "url": "http://localhost:3000/api/v1/products",
-            "headers": [],
-            "body": {}
-          },
-          {
-            "name": "Get Product by ID",
-            "method": "GET",
-            "url": "http://localhost:3000/api/v1/products/:id",
-            "headers": [],
-            "body": {}
-          },
-          {
-            "name": "Create Product",
-            "method": "POST",
-            "url": "http://localhost:3000/api/v1/products",
-            "headers": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "product": {
-                "name": "Sample Product",
-                "price": 19.99,
-                "quantity": 100,
-                "category_id": 1
-              }
-            }
-          },
-          {
-            "name": "Update Product",
-            "method": "PUT",
-            "url": "http://localhost:3000/api/v1/products/:id",
-            "headers": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "product": {
-                "name": "Updated Product Name",
-                "price": 29.99,
-                "quantity": 200,
-                "category_id": 2
-              }
-            }
-          },
-          {
-            "name": "Delete Product",
-            "method": "DELETE",
-            "url": "http://localhost:3000/api/v1/products/:id",
-            "headers": [],
-            "body": {}
-          },
-          {
-            "name": "Get Categories",
-            "method": "GET",
-            "url": "http://localhost:3000/api/v1/categories",
-            "headers": [],
-            "body": {}
-          },
-          {
-            "name": "Get Customers",
-            "method": "GET",
-            "url": "http://localhost:3000/api/v1/customers",
-            "headers": [],
-            "body": {}
-          },
-          {
-            "name": "Create Customer",
-            "method": "POST",
-            "url": "http://localhost:3000/api/v1/customers",
-            "headers": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "customer": {
-                "name": "John Doe",
-                "email": "john@example.com",
-                "phone": "123-456-7890"
-              }
-            }
-          },
-          {
-            "name": "Create Order",
-            "method": "POST",
-            "url": "http://localhost:3000/api/v1/orders",
-            "headers": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "order": {
-                "customer_id": 1,
-                "status": "pending",
-                "total_price": 49.99
-              },
-              "order_items": [
-                {
-                  "product_id": 1,
-                  "quantity": 2
-                }
-              ]
-            }
-          },
-          {
-            "name": "Get Orders",
-            "method": "GET",
-            "url": "http://localhost:3000/api/v1/orders",
-            "headers": [],
-            "body": {}
+            "key": "Content-Type",
+            "value": "application/json"
           }
         ]
       }
-    ]
-  }
-  
+    },
+    {
+      "name": "Update Product",
+      "request": {
+        "method": "PUT",
+        "url": {
+          "raw": "http://localhost:3000/api/v1/products/1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "v1",
+            "products",
+            "1"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"product\": {\"name\": \"Updated Product\",\"price\": 30.0,\"quantity\": 150,\"category_id\": 1}}"
+        },
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Delete Product",
+      "request": {
+        "method": "DELETE",
+        "url": {
+          "raw": "http://localhost:3000/api/v1/products/1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "v1",
+            "products",
+            "1"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get Orders",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:3000/api/v1/orders",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "v1",
+            "orders"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Create Order",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "http://localhost:3000/api/v1/orders",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "v1",
+            "orders"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"order\": {\"customer_id\": 1,\"total_price\": 500.0,\"status\": \"pending\",\"order_items\": [{\"product_id\": 1,\"quantity\": 2},{\"product_id\": 2,\"quantity\": 1}]}}"
+        },
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Get Customers",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:3000/api/v1/customers",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "v1",
+            "customers"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Create Customer",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "http://localhost:3000/api/v1/customers",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "v1",
+            "customers"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"customer\": {\"name\": \"John Doe\",\"email\": \"john.doe@example.com\",\"phone\": \"123-456-7890\"}}"
+        },
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Get Categories",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:3000/api/v1/categories",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "v1",
+            "categories"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Create Category",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "http://localhost:3000/api/v1/categories",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "v1",
+            "categories"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\"category\": {\"name\": \"Electronics\"}}"
+        },
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ]
+      }
+    }
+  ]
+}
