@@ -1,0 +1,133 @@
+{
+    "version": "1.0",
+    "collections": [
+      {
+        "name": "API v1",
+        "requests": [
+          {
+            "name": "Get Products",
+            "method": "GET",
+            "url": "http://localhost:3000/api/v1/products",
+            "headers": [],
+            "body": {}
+          },
+          {
+            "name": "Get Product by ID",
+            "method": "GET",
+            "url": "http://localhost:3000/api/v1/products/:id",
+            "headers": [],
+            "body": {}
+          },
+          {
+            "name": "Create Product",
+            "method": "POST",
+            "url": "http://localhost:3000/api/v1/products",
+            "headers": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "product": {
+                "name": "Sample Product",
+                "price": 19.99,
+                "quantity": 100,
+                "category_id": 1
+              }
+            }
+          },
+          {
+            "name": "Update Product",
+            "method": "PUT",
+            "url": "http://localhost:3000/api/v1/products/:id",
+            "headers": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "product": {
+                "name": "Updated Product Name",
+                "price": 29.99,
+                "quantity": 200,
+                "category_id": 2
+              }
+            }
+          },
+          {
+            "name": "Delete Product",
+            "method": "DELETE",
+            "url": "http://localhost:3000/api/v1/products/:id",
+            "headers": [],
+            "body": {}
+          },
+          {
+            "name": "Get Categories",
+            "method": "GET",
+            "url": "http://localhost:3000/api/v1/categories",
+            "headers": [],
+            "body": {}
+          },
+          {
+            "name": "Get Customers",
+            "method": "GET",
+            "url": "http://localhost:3000/api/v1/customers",
+            "headers": [],
+            "body": {}
+          },
+          {
+            "name": "Create Customer",
+            "method": "POST",
+            "url": "http://localhost:3000/api/v1/customers",
+            "headers": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "customer": {
+                "name": "John Doe",
+                "email": "john@example.com",
+                "phone": "123-456-7890"
+              }
+            }
+          },
+          {
+            "name": "Create Order",
+            "method": "POST",
+            "url": "http://localhost:3000/api/v1/orders",
+            "headers": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "order": {
+                "customer_id": 1,
+                "status": "pending",
+                "total_price": 49.99
+              },
+              "order_items": [
+                {
+                  "product_id": 1,
+                  "quantity": 2
+                }
+              ]
+            }
+          },
+          {
+            "name": "Get Orders",
+            "method": "GET",
+            "url": "http://localhost:3000/api/v1/orders",
+            "headers": [],
+            "body": {}
+          }
+        ]
+      }
+    ]
+  }
+  
