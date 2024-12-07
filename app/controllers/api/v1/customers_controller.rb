@@ -24,6 +24,26 @@ module Api
             render json: { errors: @customer.errors.full_messages }, status: :unprocessable_entity
           end
         end
+
+        def edit
+          @customer = Customer.find(params[:id])
+          render json: { customer: @customer, categories: @categories }
+        end
+  
+        def update
+          @customer = Customer.find(params[:id])
+          if @customer.update(customer_params)
+            render json: @customer, status: :ok
+          else
+            render json: { errors: @customer.errors.full_messages }, status: :unprocessable_entity
+          end
+        end
+  
+        def destroy
+          @customer = Customer.find(params[:id])
+          @customer.destroy
+          render json: { message: 'Customer deleted successfully' }, status: :no_content
+        end
   
         private
   
