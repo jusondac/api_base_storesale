@@ -1,22 +1,47 @@
 require 'rails_helper'
 
-RSpec.describe Api::V1::CustomersController, type: :controller do
-  let!(:customer) { create(:customer) }
+RSpec.describe 'Customers API', type: :request do
+  let(:user) { create(:user) }
+  let(:token) { JsonWebToken.encode(user_id: user.id) }
+  let(:headers) { { 'Content-Type' => 'application/json', 'Authorization' => "Bearer #{token}" } }
+  let!(:customer) { create(:customer, name: 'John Doe', email: 'john@example.com') }
 
-  describe 'GET #index' do
-    it 'returns a list of customers' do
-      get :index
-      Rails.logger.debug("Response body: #{response.body}")
-      expect(response).to have_http_status(:success)
+  describe 'GET /customers' do
+    it 'returns all customers' do
+      get '/api/v1/customers', headers: headers
+      expect(response).to have_http_status(:ok)
+      expect(JSON.parse(response.body).size).to eq(Customer.count)
     end
   end
 
-  describe 'GET #show' do
-    it 'returns a specific customer' do
-      get :show, params: { id: customer.id }
-      Rails.logger.debug("Response body: #{response.body}")
-      expect(response).to have_http_status(:success)
-      expect(response.body).to include(customer.name)
+  describe 'POST /customers' do
+    let(:valid_attributes) { { name: 'Jane Doe', email: 'jane@example.com', phone: '1234567890' } }
+
+    context 'when the request is valid' do
+      it 'creates a customer' do
+        post '/api/v1/customers', params: valid_attributes.to_json, headers: headers
+        expect(response).to have_http_status(:created)
+        expect(JSON.parse(response.body)['name']).to eq('Jane Doe')
+      end
+    end
+
+    context 'when the request is invalid' do
+      let(:invalid_attributes) { { name: '', email: '' } }
+
+      it 'returns a validation error' do
+        post '/api/v1/customers', params: invalid_attributes.to_json, headers: headers
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(JSON.parse(response.body)['errors']).to include("Name can't be blank")
+      end
+    end
+  end
+
+  describe 'DELETE /customers/:id' do
+    it 'deletes the customer' do
+      expect {
+        delete "/api/v1/customers/#{customer.id}", headers: headers
+      }.to change(Customer, :count).by(-1)
+      expect(response).to have_http_status(:no_content)
     end
   end
 end
