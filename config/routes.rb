@@ -7,6 +7,10 @@ Rails.application.routes.draw do
       resources :orders do
         resources :order_items, only: [:create, :destroy]
       end
+      
+      post 'auth/signup', to: 'auth#signup'
+      post 'auth/login', to: 'auth#login'
+      get 'auth/auto_login', to: 'auth#auto_login'  # Optional
     end
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

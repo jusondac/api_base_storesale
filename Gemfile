@@ -48,3 +48,6 @@ gem "faker", "~> 3.5"
 
 gem "byebug", "~> 11.1"
 gem "awesome_print", "~> 1.9"
+
+gem "bcrypt", "~> 3.1"
+gem "jwt", "~> 2.9"

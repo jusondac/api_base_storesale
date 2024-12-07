@@ -69,3 +69,18 @@ RSpec.configure do |config|
   # arbitrary gems may also be filtered via:
   # config.filter_gems_from_backtrace("gem name")
 end
+module AuthHelper
+  def authenticated_header(user)
+    token = JsonWebToken.encode(user_id: user.id)
+    { 'Authorization': "Bearer #{token}" }
+  end
+
+  def create_user(email: 'user2@example.com', password: 'password123')
+    User.create!(email: email, password: password)
+  end
+end
+
+RSpec.configure do |config|
+  config.include AuthHelper
+end
+

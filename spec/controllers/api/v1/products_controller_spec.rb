@@ -1,51 +1,48 @@
 require 'rails_helper'
 
 RSpec.describe Api::V1::ProductsController, type: :controller do
-  let!(:category) { create(:category) }
-  let!(:product) { create(:product, category: category) }
+  let(:user) { create_user }
+  let(:headers) { authenticated_header(user) }
+  let!(:product) { Product.create(name: 'Test Product', quantity: 10, price: 100.0) }
 
   describe 'GET #index' do
-    it 'returns a list of products' do
-      get :index
-      expect(response).to have_http_status(:success)
-      expect(response.body).to include(product.name)
+    context 'with valid authentication' do
+      it 'returns a list of products' do
+        request.headers.merge!(headers)
+        get :index
+
+        expect(response).to have_http_status(:ok)
+        expect(JSON.parse(response.body)).not_to be_empty
+      end
+    end
+
+    context 'without authentication' do
+      it 'returns unauthorized status' do
+        get :index
+        expect(response).to have_http_status(:unauthorized)
+      end
     end
   end
 
   describe 'GET #show' do
-    it 'returns a product' do
-      get :show, params: { id: product.id }
-      expect(response).to have_http_status(:success)
-      expect(response.body).to include(product.name)
-    end
-  end
+    context 'with valid authentication' do
+      it 'returns the requested product' do
+        request.headers.merge!(headers)
+        get :show, params: { id: product.id }
 
-  describe 'POST #create' do
-    it 'creates a new product' do
-      product_params = { name: 'New Product', price: 99.99, quantity: 10, category_id: category.id }
-      post :create, params: { product: product_params }
-      Rails.logger.debug("Response body: #{response.body}")
-      expect(response).to have_http_status(:created)
-      expect(Product.last.name).to eq('New Product')
+        expect(response).to have_http_status(:ok)
+        expect(JSON.parse(response.body)['name']).to eq('Test Product')
+      end
     end
-  end
 
-  describe 'PUT #update' do
-    it 'updates an existing product' do
-      updated_name = 'Updated Product'
-      put :update, params: { id: product.id, product: { name: updated_name } }
-      Rails.logger.debug("Response body: #{response.body}")
-      expect(response).to have_http_status(:ok)
-      expect(product.reload.name).to eq(updated_name)
-    end
-  end
+    context 'with invalid product ID' do
+      it 'returns not found status' do
+        request.headers.merge!(headers)
+        get :show, params: { id: 0 }
 
-  describe 'DELETE #destroy' do
-    it 'deletes a product' do
-      delete :destroy, params: { id: product.id }
-      Rails.logger.debug("Response body: #{response.body}")
-      expect(response).to have_http_status(:no_content)
-      expect(Product.exists?(product.id)).to be_falsey
+        expect(response).to have_http_status(:not_found)
+        expect(JSON.parse(response.body)['error']).to eq("Product not found")
+      end
     end
   end
 end

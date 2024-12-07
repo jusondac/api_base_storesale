@@ -14,18 +14,18 @@ end
 
 # Seed products
 products = categories.flat_map do |category|
-  10.times.map do
+  150.times.map do
     Product.create!(
       name: Faker::Commerce.product_name,
       price: Faker::Commerce.price(range: 10.0..100.0),
-      quantity: rand(10..100),
+      quantity: rand(100..1000),
       category: category
     )
   end
 end
 
 # Seed customers
-customers = 10.times.map do
+customers = 100.times.map do
   Customer.create!(
     name: Faker::Name.name,
     email: Faker::Internet.email,
@@ -35,7 +35,7 @@ end
 
 # Seed orders
 customers.each do |customer|
-  rand(1..5).times do
+  rand(1..60).times do
     items = products.sample(rand(1..3)).map do |product|
       {
         product_id: product.id,
