@@ -10,7 +10,7 @@ class JsonWebToken
         decoded = JWT.decode(token, SECRET_KEY)[0]
         HashWithIndifferentAccess.new(decoded)    
     rescue JWT::DecodeError
-        nill
+        nil
     end
     
 end
