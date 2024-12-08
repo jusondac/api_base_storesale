@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_12_07_035829) do
+ActiveRecord::Schema[7.2].define(version: 2024_12_08_071302) do
   create_table "categories", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
@@ -33,6 +33,16 @@ ActiveRecord::Schema[7.2].define(version: 2024_12_07_035829) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "invoices", force: :cascade do |t|
+    t.integer "order_id", null: false
+    t.string "status"
+    t.decimal "total_amount"
+    t.datetime "due_date"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["order_id"], name: "index_invoices_on_order_id"
+  end
+
   create_table "order_items", force: :cascade do |t|
     t.integer "order_id", null: false
     t.integer "product_id", null: false
@@ -53,6 +63,17 @@ ActiveRecord::Schema[7.2].define(version: 2024_12_07_035829) do
     t.index ["customer_id"], name: "index_orders_on_customer_id"
   end
 
+  create_table "payments", force: :cascade do |t|
+    t.integer "invoice_id", null: false
+    t.decimal "amount"
+    t.string "status"
+    t.datetime "payment_date"
+    t.string "payment_method"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["invoice_id"], name: "index_payments_on_invoice_id"
+  end
+
   create_table "products", force: :cascade do |t|
     t.string "name"
     t.float "price"
@@ -63,6 +84,35 @@ ActiveRecord::Schema[7.2].define(version: 2024_12_07_035829) do
     t.index ["category_id"], name: "index_products_on_category_id"
   end
 
+  create_table "restocks", force: :cascade do |t|
+    t.integer "product_id", null: false
+    t.integer "quantity"
+    t.datetime "restocked_at"
+    t.integer "supplier_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["product_id"], name: "index_restocks_on_product_id"
+    t.index ["supplier_id"], name: "index_restocks_on_supplier_id"
+  end
+
+  create_table "stocks", force: :cascade do |t|
+    t.integer "product_id", null: false
+    t.integer "quantity"
+    t.datetime "last_updated_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["product_id"], name: "index_stocks_on_product_id"
+  end
+
+  create_table "suppliers", force: :cascade do |t|
+    t.string "name"
+    t.string "email"
+    t.string "phone_number"
+    t.text "address"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email"
     t.string "password_digest"
@@ -71,8 +121,13 @@ ActiveRecord::Schema[7.2].define(version: 2024_12_07_035829) do
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 
+  add_foreign_key "invoices", "orders"
   add_foreign_key "order_items", "orders"
   add_foreign_key "order_items", "products"
   add_foreign_key "orders", "customers"
+  add_foreign_key "payments", "invoices"
   add_foreign_key "products", "categories"
+  add_foreign_key "restocks", "products"
+  add_foreign_key "restocks", "suppliers"
+  add_foreign_key "stocks", "products"
 end
