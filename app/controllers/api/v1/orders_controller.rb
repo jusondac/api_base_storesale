@@ -19,7 +19,8 @@ module Api
         end
   
         def create
-          items = params[:order_items].map do |item|
+          return render json: { error: "Really fuckers? u didn't buy anythin?", status: :unprocessable_entity } if (order_params[:order_items].nil? || order_params[:order_items].empty?)
+          items = order_params[:order_items].map do |item|
             {
               product_id: item[:product_id],
               quantity: item[:quantity],
@@ -38,7 +39,7 @@ module Api
         private
   
         def order_params
-          params.require(:order).permit(:customer_id, :total_price, :status)
+          params.require(:order).permit(:customer_id, :status, order_items: [:product_id, :quantity, :unit_price])
         end
       end
     end
