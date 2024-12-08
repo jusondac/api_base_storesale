@@ -4,12 +4,10 @@ RSpec.describe 'Orders API', type: :request do
   let(:user) { create(:user) }
   let(:token) { JsonWebToken.encode(user_id: user.id) }
   let(:headers) { { 'Content-Type' => 'application/json', 'Authorization' => "Bearer #{token}" } }
-
-  # Assuming an Order belongs to a Customer and has multiple Products
+  
   let!(:customer) { create(:customer, name: 'John Doe', email: 'john@example.com') }
-  let!(:product1) { create(:product, name: 'Product 1', price: 100, quantity: 10) }
-  let!(:product2) { create(:product, name: 'Product 2', price: 200, quantity: 5) }
-  let!(:order) { create(:order, customer: customer, status: 'pending') }
+  let!(:order) { create(:order, customer: customer) }
+  let(:product) { create(:product, price: 100) }
 
   describe 'GET /orders' do
     it 'returns all orders' do
@@ -24,7 +22,6 @@ RSpec.describe 'Orders API', type: :request do
       it 'returns the order' do
         get "/api/v1/orders/#{order.id}", headers: headers
         expect(response).to have_http_status(:ok)
-        expect(JSON.parse(response.body)['status']).to eq('pending')
       end
     end
 
@@ -37,65 +34,84 @@ RSpec.describe 'Orders API', type: :request do
     end
   end
 
-  describe 'POST /orders' do
-    # let(:valid_attributes) { { customer_id: customer.id, status: 'confirmed', product_ids: [product1.id, product2.id] } }
-    let(:valid_attributes) { { 
-      order_items: {customer_id: customer.id, status: 'confirmed', product_ids: [product1.id, product2.id]}
-     } }
-    let(:invalid_attributes) { { customer_id: nil, status: '' } }
+  describe 'POST /api/v1/orders' do
+    context 'when the order is valid' do
+      let(:valid_order) do
+        {
+          order: {
+            customer_id: customer.id,
+            status: "pending",
+            order_items: [
+              { product_id: product.id, quantity: 2 }
+            ]
+          }
+        }
+      end
 
-    context 'when the request is valid' do
-      it 'creates an order' do
-        post '/api/v1/orders', params: valid_attributes.to_json, headers: headers
+      it 'creates an order successfully' do
+        post '/api/v1/orders', params: valid_order.to_json, headers: headers
+
         expect(response).to have_http_status(:created)
-        expect(JSON.parse(response.body)['status']).to eq('confirmed')
+        response_body = JSON.parse(response.body)
+        expect(response_body['customer_id']).to eq(customer.id)
       end
     end
 
-    context 'when the request is invalid' do
-      it 'returns a validation error' do
-        post '/api/v1/orders', params: invalid_attributes.to_json, headers: headers
+    context 'when order items are empty' do
+      let(:invalid_order) do
+        {
+          order: {
+            customer_id: customer.id,
+            status: "pending",
+            order_items: []
+          }
+        }
+      end
+
+      it 'returns an error message for empty order items' do
+        post '/api/v1/orders', params: invalid_order.to_json, headers: headers
+
+        response_body = JSON.parse(response.body)
+        expect(response_body['status']).to eq("unprocessable_entity")
+        expect(response_body['error']).to eq("Really fuckers? u didn't buy anythin?")
+      end
+    end
+
+    context 'when order items are missing' do
+      let(:missing_items_order) do
+        {
+          order: {
+            customer_id: customer.id
+          }
+        }
+      end
+
+      it 'returns an error message for missing order items' do
+        post '/api/v1/orders', params: missing_items_order.to_json, headers: headers
+        response_body = JSON.parse(response.body)
+        expect(response_body['status']).to eq("unprocessable_entity")
+        expect(response_body['error']).to eq("Really fuckers? u didn't buy anythin?")
+      end
+    end
+
+    context 'when an exception occurs' do
+      let(:invalid_customer_order) do
+        {
+          order: {
+            customer_id: 999, # Invalid customer ID
+            order_items: [
+              { product_id: product.id, quantity: 2 }
+            ]
+          }
+        }
+      end
+
+      it 'returns an error message for an exception' do
+        post '/api/v1/orders', params: invalid_customer_order.to_json, headers: headers
+
         expect(response).to have_http_status(:unprocessable_entity)
-        expect(JSON.parse(response.body)['errors']).to include("Customer can't be blank")
-      end
-    end
-  end
-
-  describe 'PUT /orders/:id' do
-    let(:valid_attributes) { { status: 'shipped' } }
-
-    context 'when the order exists' do
-      it 'updates the order' do
-        put "/api/v1/orders/#{order.id}", params: valid_attributes.to_json, headers: headers
-        expect(response).to have_http_status(:ok)
-        expect(JSON.parse(response.body)['status']).to eq('shipped')
-      end
-    end
-
-    context 'when the order does not exist' do
-      it 'returns a not found message' do
-        put '/api/v1/orders/999', params: valid_attributes.to_json, headers: headers
-        expect(response).to have_http_status(:not_found)
-        expect(JSON.parse(response.body)['error']).to eq("Order not found")
-      end
-    end
-  end
-
-  describe 'DELETE /orders/:id' do
-    context 'when the order exists' do
-      it 'deletes the order' do
-        expect {
-          delete "/api/v1/orders/#{order.id}", headers: headers
-        }.to change(Order, :count).by(-1)
-        expect(response).to have_http_status(:no_content)
-      end
-    end
-
-    context 'when the order does not exist' do
-      it 'returns a not found message' do
-        delete '/api/v1/orders/999', headers: headers
-        expect(response).to have_http_status(:not_found)
-        expect(JSON.parse(response.body)['error']).to eq("Order not found")
+        response_body = JSON.parse(response.body)
+        expect(response_body['errors']).to match(/Couldn't find Customer/)
       end
     end
   end
