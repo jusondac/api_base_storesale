@@ -68,6 +68,8 @@ cd ecommerce-api
 - Version 2: Inventory and sales analytics.
 - Version 3: Production and advanced reporting.
 
+Currently, API Base on going to manage analitics and better bussiness system model.
+
 ## Contributions
 
 Feel free to fork this repo, submit issues, or create pull requests. Contributions are always welcome!
