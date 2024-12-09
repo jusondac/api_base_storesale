@@ -12,7 +12,7 @@ class OrderCreator
           product = Product.find(item[:product_id])
   
           # Ensure sufficient stock
-          raise "Insufficient stock for #{product.name}" if product.quantity < item[:quantity]
+          raise "Insufficient stock for #{product.name}" if product.stock.quantity < item[:quantity]
   
           # Create order item
           OrderItem.create!(
@@ -24,6 +24,7 @@ class OrderCreator
   
           # Deduct stock
           product.update!(quantity: product.quantity - item[:quantity])
+          product.stock.update!(quantity: product.stock.quantity - item[:quantity])
         end
   
         order
