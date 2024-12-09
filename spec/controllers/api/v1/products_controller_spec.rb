@@ -7,7 +7,7 @@ RSpec.describe 'Products API', type: :request do
   let!(:product) { create(:product, price: 100) }
   let!(:category) { create(:category, name: 'lol') }
 
-  describe 'GET /products' do
+  describe 'GET /api/v1/products' do
     it 'returns all products' do
       get '/api/v1/products', headers: headers
       expect(response).to have_http_status(:ok)
@@ -15,7 +15,7 @@ RSpec.describe 'Products API', type: :request do
     end
   end
 
-  describe 'GET /products/:id' do
+  describe 'GET /api/v1/products/:id' do
     context 'when the product exists' do
       it 'returns the product' do
         get "/api/v1/products/#{product.id}", headers: headers
@@ -34,24 +34,52 @@ RSpec.describe 'Products API', type: :request do
     end
   end
 
-  describe 'POST /products' do
-    let(:valid_attributes) { { name: 'Furniture', price: 100, quantity: 100, category_id: category.id } }
-    let(:invalid_attributes) { { name: '', price: 100, quantity: 100, category_id: category.id } }
+  describe 'POST /api/v1/products/:id' do
+    context 'when valid parameters are provided' do
+      it 'creates a product and initializes stock' do
+        product = nil
+        expect {
+          product = ProductService.create_product(
+            name: "Laptop",
+            price: 1500.00,
+            quantity: 10,
+            category_id: category.id
+          )
+        }.to change(Product, :count).by(1)
+         .and change(Stock, :count).by(1)
 
-    context 'when the request is valid' do
-      it 'creates a product' do
-        post '/api/v1/products', params: valid_attributes.to_json, headers: headers
-        expect(response).to have_http_status(:created)
-        response_body = JSON.parse(response.body)
-        expect(response_body['name']).to eq('Furniture')
+        stock = Stock.find_by(product_id: product.id)
+
+        expect(product.name).to eq("Laptop")
+        expect(product.quantity).to eq(10)
+        expect(stock.quantity).to eq(10)
+        expect(stock.last_updated_at).to be_present
       end
     end
 
-    context 'when the request is invalid' do
-      it 'returns a validation error' do
-        post '/api/v1/products', params: invalid_attributes.to_json, headers: headers
-        expect(response).to have_http_status(:unprocessable_entity)
-        expect(JSON.parse(response.body)['errors']).to include("Name can't be blank")
+    context 'when invalid parameters are provided' do
+      it 'raises an error if the product cannot be saved' do
+        expect {
+          ProductService.create_product(
+            name: nil, # Invalid name
+            price: 1500.00,
+            quantity: 10,
+            category_id: category.id
+          )
+        }.to raise_error(/Name can't be blank/)
+      end
+
+      it 'raises an error if stock cannot be initialized' do
+        allow_any_instance_of(Stock).to receive(:save).and_return(false) # Simulate stock save failure
+
+        expect {
+          ProductService.create_product(
+            name: "Laptop",
+            price: 1500.00,
+            quantity: 10,
+            category_id: category.id
+          )
+        }.to raise_error(/Failed to create product and stock/)
       end
     end
   end
