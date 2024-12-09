@@ -18,12 +18,15 @@ module Api
       end
 
       def create
-        @product = Product.new(product_params)
-        if @product.save
-          render json: @product, status: :created
-        else
-          render json: { errors: @product.errors.full_messages }, status: :unprocessable_entity
-        end
+        product = ProductService.create_product(
+          name: product_params[:name],
+          price: product_params[:price],
+          quantity: product_params[:quantity],
+          category_id: product_params[:category_id]
+        )
+        render json: product, status: :created
+      rescue => e
+        render json: { error: e.message }, status: :unprocessable_entity
       end
 
       def edit
@@ -40,6 +43,7 @@ module Api
           render json: { errors: @product.errors.full_messages }, status: :unprocessable_entity
         end
       end
+      
 
       def destroy
         @product = Product.find(params[:id])
