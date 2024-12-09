@@ -6,14 +6,14 @@ class Api::V2::StocksController < ApplicationController
 
   def show
     stock = Stock.find_by(id: params[:id])
-    return render json: { error: "Stock not found" }, status: :not_found unless stock
+    return render json: { error: "this mf Stock not found you idiot!" }, status: :not_found unless stock
 
     render json: stock, include: :product, status: :ok
   end
 
   def update
-    stock = Stock.find_by(id: params[:id])
-    return render json: { error: "Stock not found" }, status: :not_found unless stock
+    stock = StockService.update_stock(stock_id: params[:id], quantity: stock_params[:quantity])
+    return render json: { error: "Told you, its not found dumbass" }, status: :not_found unless stock
 
     if stock.update(stock_params)
       render json: stock, status: :ok

@@ -8,7 +8,18 @@ module Api
   
         def show
           @order = Order.includes(:order_items, :products).find(params[:id])
-          render json: @order, include: { order_items: { include: :product } }
+          @order = @order.as_json(
+            include: {
+              customer: {only: [:name, :email]},
+              order_items: {
+                except: [:created_at, :updated_at, :order_id, :product_id, :id],
+                include: {
+                  product: {except: [:created_at, :updated_at, :category_id, :id]}
+                }
+              }
+            }
+          )
+          render json: @order, status: :ok
         end
   
         def new
