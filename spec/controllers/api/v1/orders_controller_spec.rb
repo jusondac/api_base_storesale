@@ -73,7 +73,7 @@ RSpec.describe 'Orders API', type: :request do
 
         response_body = JSON.parse(response.body)
         expect(response_body['status']).to eq("unprocessable_entity")
-        expect(response_body['error']).to eq("Really fuckers? u didn't buy anythin?")
+        expect(response_body['error']).to eq("Order items cannot be empty")
       end
     end
 
@@ -90,7 +90,7 @@ RSpec.describe 'Orders API', type: :request do
         post '/api/v1/orders', params: missing_items_order.to_json, headers: headers
         response_body = JSON.parse(response.body)
         expect(response_body['status']).to eq("unprocessable_entity")
-        expect(response_body['error']).to eq("Really fuckers? u didn't buy anythin?")
+        expect(response_body['error']).to eq("Order items are required")
       end
     end
 
