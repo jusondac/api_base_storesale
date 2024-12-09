@@ -5,9 +5,11 @@ RSpec.describe 'Orders API', type: :request do
   let(:token) { JsonWebToken.encode(user_id: user.id) }
   let(:headers) { { 'Content-Type' => 'application/json', 'Authorization' => "Bearer #{token}" } }
   
+  let(:product) { create(:product, price: 100) }
+  let!(:stock) { create(:stock, product: product, quantity: 10, last_updated_at: 1.day.ago) }
   let!(:customer) { create(:customer, name: 'John Doe', email: 'john@example.com') }
   let!(:order) { create(:order, customer: customer) }
-  let(:product) { create(:product, price: 100) }
+
 
   describe 'GET /orders' do
     it 'returns all orders' do
@@ -36,6 +38,7 @@ RSpec.describe 'Orders API', type: :request do
 
   describe 'POST /api/v1/orders' do
     context 'when the order is valid' do
+
       let(:valid_order) do
         {
           order: {
@@ -47,6 +50,7 @@ RSpec.describe 'Orders API', type: :request do
           }
         }
       end
+      let(:stock) {create(:stock, product: product)}
 
       it 'creates an order successfully' do
         post '/api/v1/orders', params: valid_order.to_json, headers: headers
