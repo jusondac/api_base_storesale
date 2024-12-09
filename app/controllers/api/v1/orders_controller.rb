@@ -10,11 +10,11 @@ module Api
           @order = Order.includes(:order_items, :products).find(params[:id])
           @order = @order.as_json(
             include: {
-              customer: {only: [:name, :email]},
+              customer: { only: [:name, :email] },
               order_items: {
                 except: [:created_at, :updated_at, :order_id, :product_id, :id],
                 include: {
-                  product: {except: [:created_at, :updated_at, :category_id, :id]}
+                  product: { except: [:created_at, :updated_at, :category_id, :id] }
                 }
               }
             }
@@ -24,8 +24,8 @@ module Api
   
         def new
           @order = Order.new
-          @customers = Customer.all
-          @products = Product.all
+          @customers = Customer.select(:id, :name, :email)
+          @products = Product.select(:id, :name, :price)
           render json: { order: @order, customers: @customers, products: @products }
         end
   
@@ -50,7 +50,7 @@ module Api
         private
   
         def order_params
-          params.require(:order).permit(:customer_id, :status, order_items: [:product_id, :quantity, :unit_price])
+          params.require(:order).permit(:customer_id, :status, order_items: [:product_id, :quantity])
         end
       end
     end
