@@ -51,3 +51,7 @@ gem "awesome_print", "~> 1.9"
 
 gem "bcrypt", "~> 3.1"
 gem "jwt", "~> 2.9"
+
+gem "active_model_serializers", "~> 0.10.15"
+
+gem "fast_jsonapi", "~> 1.5"
