@@ -1,9 +1,9 @@
 FactoryBot.define do
   factory :payment do
-    association :invoice
-    amount { "9.99" }
-    status { "MyString" }
-    payment_date { "2024-12-08 14:13:03" }
-    payment_method { "MyString" }
+    invoice
+    amount { 100.00 }
+    status { "completed" }
+    payment_date { Time.current }
+    payment_method { "credit_card" }
   end
 end
