@@ -40,7 +40,6 @@ module Api
           end
           customer = Customer.find(order_params[:customer_id])
           @order = OrderCreator.create_order(customer: customer, items: items)
-        
           render json: @order, status: :created
         rescue => e
           render json: { errors: e.message }, status: :unprocessable_entity
