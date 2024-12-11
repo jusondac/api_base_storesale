@@ -13,11 +13,12 @@ Rails.application.routes.draw do
     end
     namespace :v2 do
       resources :stocks, only: [:index, :show, :update]
-      resources :restocks, only: [:create]
+      resources :restocks, only: [:create, :index, :show]
       resources :suppliers, only: [:index, :create]
       resources :invoices, only: [:index, :show]
-      resources :payments, only: [:create]
+      resources :payments, only: [:index, :create]
       resources :employees, only: [:index]
+      resources :storefronts, only: [:index, :show, :create, :update, :destroy]
     end
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

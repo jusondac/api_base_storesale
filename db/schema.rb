@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_12_08_071302) do
+ActiveRecord::Schema[8.0].define(version: 2024_12_11_054226) do
   create_table "categories", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
@@ -66,22 +66,24 @@ ActiveRecord::Schema[7.2].define(version: 2024_12_08_071302) do
   create_table "payments", force: :cascade do |t|
     t.integer "invoice_id", null: false
     t.decimal "amount"
-    t.string "status"
     t.datetime "payment_date"
     t.string "payment_method"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "status", default: 0
     t.index ["invoice_id"], name: "index_payments_on_invoice_id"
   end
 
   create_table "products", force: :cascade do |t|
     t.string "name"
     t.float "price"
-    t.integer "quantity"
+    t.integer "quantity", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "category_id"
+    t.integer "storefront_id"
     t.index ["category_id"], name: "index_products_on_category_id"
+    t.index ["storefront_id"], name: "index_products_on_storefront_id"
   end
 
   create_table "restocks", force: :cascade do |t|
@@ -102,6 +104,16 @@ ActiveRecord::Schema[7.2].define(version: 2024_12_08_071302) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["product_id"], name: "index_stocks_on_product_id"
+  end
+
+  create_table "storefronts", force: :cascade do |t|
+    t.string "name"
+    t.integer "user_id", null: false
+    t.string "address"
+    t.string "city"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_storefronts_on_user_id"
   end
 
   create_table "suppliers", force: :cascade do |t|
@@ -127,7 +139,9 @@ ActiveRecord::Schema[7.2].define(version: 2024_12_08_071302) do
   add_foreign_key "orders", "customers"
   add_foreign_key "payments", "invoices"
   add_foreign_key "products", "categories"
+  add_foreign_key "products", "storefronts"
   add_foreign_key "restocks", "products"
   add_foreign_key "restocks", "suppliers"
   add_foreign_key "stocks", "products"
+  add_foreign_key "storefronts", "users"
 end

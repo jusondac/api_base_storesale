@@ -5,9 +5,9 @@ class OrderCreator
         total_price = items.sum { |item| item[:quantity] * item[:unit_price] }
         
         # Create the order
-        order = Order.create!(customer: customer, total_price: total_price, status: 'Pending')
-        
+        order = Order.create!(customer: customer, total_price: total_price, status: 'pending')
         # Add items to the order
+        raise "Unable to create invoice" unless InvoiceService.create_invoice(order)
         items.each do |item|
           product = Product.find(item[:product_id])
   
@@ -21,12 +21,10 @@ class OrderCreator
             quantity: item[:quantity],
             unit_price: item[:unit_price]
           )
-          
           # Deduct stock
           product.update!(quantity: product.quantity - item[:quantity])
           product.stock.update!(quantity: product.stock.quantity - item[:quantity])
         end
-  
         order
       end
     rescue => e
