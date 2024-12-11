@@ -2,6 +2,7 @@ class Product < ApplicationRecord
     has_one :stock, dependent: :destroy
     has_many :restocks, dependent: :destroy
     belongs_to :category
+    belongs_to :storefront
     has_many :order_items
     has_many :orders, through: :order_items
   
