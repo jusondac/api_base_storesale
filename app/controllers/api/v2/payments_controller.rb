@@ -1,12 +1,14 @@
 class Api::V2::PaymentsController < ApplicationController
+  def index
+    @payments = PaymentService.get_payments
+    render json: @payments, status: :ok
+  end
+  
   def create
-    payment = Payment.new(payment_params)
-
-    if payment.save
-      render json: payment, status: :created
-    else
-      render json: { errors: payment.errors.full_messages }, status: :unprocessable_entity
-    end
+    payment = PaymentService.create_payment(params[:invoice_id], params[:amount], params[:payment_method])
+    render json: { message: "Payment successful" }, status: :created
+  rescue => e
+    render json: { error: e.message }, status: :unprocessable_entity
   end
 
   private
