@@ -5,7 +5,11 @@ RSpec.describe 'Products API', type: :request do
   let(:token) { JsonWebToken.encode(user_id: user.id) }
   let(:headers) { { 'Content-Type' => 'application/json', 'Authorization' => "Bearer #{token}" } }
   let!(:product) { create(:product, price: 100) }
-  let!(:category) { create(:category, name: 'lol') }
+  let!(:storefront) { create(:storefront, user: user) }
+  let!(:category) { create(:category, name: 'Home Tools') }
+  let(:valid_attributes) { {name: "Laptop", category_id: category.id, storefront_id: storefront.id, quantity: 200, price: 200.00 } }
+  let(:invalid_attributes) { {name: nil, category_id: category.id, storefront_id:storefront.id, quantity: 200, price: 200.00 } }
+  let(:miss_storefront_attributes) { {name: "Laptop", category_id: category.id, storefront_id:nil, quantity: 200, price: 200.00 } }
 
   describe 'GET /api/v1/products' do
     it 'returns all products' do
@@ -34,39 +38,33 @@ RSpec.describe 'Products API', type: :request do
     end
   end
 
-  describe 'POST /api/v1/products/:id' do
+  describe 'POST /api/v1/products/' do
     context 'when valid parameters are provided' do
       it 'creates a product and initializes stock' do
-        product = nil
-        expect {
-          product = ProductService.create_product(
-            name: "Laptop",
-            price: 1500.00,
-            quantity: 10,
-            category_id: category.id
-          )
-        }.to change(Product, :count).by(1)
-         .and change(Stock, :count).by(1)
-
-        stock = Stock.find_by(product_id: product.id)
-
-        expect(product.name).to eq("Laptop")
-        expect(product.quantity).to eq(10)
-        expect(stock.quantity).to eq(10)
-        expect(stock.last_updated_at).to be_present
+        post "/api/v1/products", params: valid_attributes.to_json, headers: headers
+        expect(response).to have_http_status(:created)
+        product = JSON.parse(response.body)
+        stock = Stock.find_by(product_id: product['id'])
+        expect(product['name']).to eq('Laptop')
+        expect(product['price']).to eq(200.00)
+        expect(product['quantity']).to eq(200)
+        expect(product['category_id']).to eq(category.id)
+        expect(product['storefront_id']).to eq(storefront.id)
+        expect(stock.quantity).to eq(200)
       end
     end
 
     context 'when invalid parameters are provided' do
       it 'raises an error if the product cannot be saved' do
-        expect {
-          ProductService.create_product(
-            name: nil, # Invalid name
-            price: 1500.00,
-            quantity: 10,
-            category_id: category.id
-          )
-        }.to raise_error(/Name can't be blank/)
+        post "/api/v1/products", params: invalid_attributes.to_json, headers: headers
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(JSON.parse(response.body)['error']).to eq("Failed to create product and stock: Name can't be blank")
+      end
+
+      it 'raises an error if storefront is not exist' do
+        post "/api/v1/products", params: miss_storefront_attributes.to_json, headers: headers
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(JSON.parse(response.body)['error']).to eq("Failed to create product and stock: Storefront must exist")
       end
 
       it 'raises an error if stock cannot be initialized' do
@@ -77,7 +75,8 @@ RSpec.describe 'Products API', type: :request do
             name: "Laptop",
             price: 1500.00,
             quantity: 10,
-            category_id: category.id
+            category_id: category.id,
+            storefront_id: storefront.id
           )
         }.to raise_error(/Failed to create product and stock/)
       end

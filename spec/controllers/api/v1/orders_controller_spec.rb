@@ -6,7 +6,7 @@ RSpec.describe 'Orders API', type: :request do
   let(:headers) { { 'Content-Type' => 'application/json', 'Authorization' => "Bearer #{token}" } }
   
   let(:product) { create(:product, price: 100) }
-  let!(:stock) { create(:stock, product: product, quantity: 10, last_updated_at: 1.day.ago) }
+  let!(:stock) { create(:stock, product: product, quantity: 100, last_updated_at: 1.day.ago) }
   let!(:customer) { create(:customer, name: 'John Doe', email: 'john@example.com') }
   let!(:order) { create(:order, customer: customer) }
 
@@ -16,6 +16,10 @@ RSpec.describe 'Orders API', type: :request do
       get '/api/v1/orders', headers: headers
       expect(response).to have_http_status(:ok)
       expect(JSON.parse(response.body).size).to eq(Order.count)
+    end
+    it 'Unauhorize' do
+      get '/api/v1/orders'
+      expect(response).to have_http_status(:unauthorized)
     end
   end
 
@@ -50,7 +54,6 @@ RSpec.describe 'Orders API', type: :request do
           }
         }
       end
-      let(:stock) {create(:stock, product: product)}
 
       it 'creates an order successfully' do
         post '/api/v1/orders', params: valid_order.to_json, headers: headers
