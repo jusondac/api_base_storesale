@@ -22,7 +22,8 @@ module Api
           name: product_params[:name],
           price: product_params[:price],
           quantity: product_params[:quantity],
-          category_id: product_params[:category_id]
+          category_id: product_params[:category_id],
+          storefront_id: product_params[:storefront_id]
         )
         render json: product, status: :created
       rescue => e
@@ -54,7 +55,7 @@ module Api
       private
 
       def product_params
-        params.require(:product).permit(:name, :price, :quantity, :category_id)
+        params.require(:product).permit(:name, :price, :quantity, :category_id, :storefront_id)
       end
     end
   end
