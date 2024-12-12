@@ -6,4 +6,6 @@ class Storefront < ApplicationRecord
   validates :user_id, presence: true
   validates :city, presence: true
   validates :address, presence: true
+
+  def owner;user;end
 end
