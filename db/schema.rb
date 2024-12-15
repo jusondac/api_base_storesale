@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_12_11_054226) do
+ActiveRecord::Schema[8.0].define(version: 2024_12_14_163710) do
   create_table "categories", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
@@ -40,7 +40,9 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_11_054226) do
     t.datetime "due_date"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "shipping_id"
     t.index ["order_id"], name: "index_invoices_on_order_id"
+    t.index ["shipping_id"], name: "index_invoices_on_shipping_id"
   end
 
   create_table "order_items", force: :cascade do |t|
@@ -97,6 +99,15 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_11_054226) do
     t.index ["supplier_id"], name: "index_restocks_on_supplier_id"
   end
 
+  create_table "shippings", force: :cascade do |t|
+    t.integer "customer_id", null: false
+    t.string "address"
+    t.string "title"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["customer_id"], name: "index_shippings_on_customer_id"
+  end
+
   create_table "stocks", force: :cascade do |t|
     t.integer "product_id", null: false
     t.integer "quantity"
@@ -134,6 +145,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_11_054226) do
   end
 
   add_foreign_key "invoices", "orders"
+  add_foreign_key "invoices", "shippings"
   add_foreign_key "order_items", "orders"
   add_foreign_key "order_items", "products"
   add_foreign_key "orders", "customers"
@@ -142,6 +154,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_11_054226) do
   add_foreign_key "products", "storefronts"
   add_foreign_key "restocks", "products"
   add_foreign_key "restocks", "suppliers"
+  add_foreign_key "shippings", "customers"
   add_foreign_key "stocks", "products"
   add_foreign_key "storefronts", "users"
 end

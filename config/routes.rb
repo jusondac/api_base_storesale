@@ -12,7 +12,10 @@ Rails.application.routes.draw do
       get 'auth/auto_login', to: 'auth#auto_login'  # Optional
     end
     namespace :v2 do
-      resources :analytics, only: [:index]
+      namespace :analytics do
+        resources :simple_analytics, only: [:index]
+        # resources :advance_analytics, only: [:index]
+      end
       resources :stocks, only: [:index, :show, :update]
       resources :restocks, only: [:create, :index, :show]
       resources :suppliers, only: [:index, :create]
