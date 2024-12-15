@@ -5,5 +5,5 @@
 # t.date :estimated_delivery_date
 # t.references :customer, foreign_key: true
 class Shipping < ApplicationRecord
-  belongs_to :customer
+  belongs_to :customer, class_name: 'User', foreign_key: 'customer_id'
 end

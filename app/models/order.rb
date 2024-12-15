@@ -7,8 +7,7 @@
 # - updated_at: datetime
 class Order < ApplicationRecord
   has_one :invoice, dependent: :destroy
-  belongs_to :customer
-  belongs_to :user
+  belongs_to :customer, class_name: 'User', foreign_key: 'customer_id'
   has_many :order_items, dependent: :destroy
   accepts_nested_attributes_for :order_items
   has_many :products, through: :order_items
