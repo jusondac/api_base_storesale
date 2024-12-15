@@ -1,9 +1,10 @@
-# Attributes for the Order model
-# t.integer :customer_id
-# t.decimal :total_price, precision: 10, scale: 2
-# t.string :status
-# t.datetime :created_at, null: false
-# t.datetime :updated_at, null: false
+# Attributes for the Order model:
+# - id: integer
+# - customer_id: integer
+# - total_price: decimal
+# - status: string
+# - created_at: datetime
+# - updated_at: datetime
 class Order < ApplicationRecord
   has_one :invoice, dependent: :destroy
   belongs_to :customer

@@ -6,4 +6,8 @@ class User < ApplicationRecord
 
     has_many :storefronts, dependent: :destroy
     has_many :products, through: :storefronts
+    
+    enum :role, [:master, :admin, :customer]
+
+   
 end
