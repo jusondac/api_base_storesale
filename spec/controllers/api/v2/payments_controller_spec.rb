@@ -5,6 +5,8 @@ RSpec.describe "Payments API", type: :request do
   let(:auth_token) { JsonWebToken.encode(user_id: user.id) }
   let(:headers) { { "Authorization" => "Bearer #{auth_token}", "Content-Type" => "application/json" } }
 
+  let(:customer) { create(:customer) } # Assuming a customer factory exists
+  let(:shipping) { create(:shipping, customer: customer) } # Assuming a shipping factory exists
   let(:invoice) { create(:invoice) } # Assuming an invoice factory exists
   let(:valid_payment_params) { { invoice_id: invoice.id, amount: 100.50, status: "completed", payment_method: "credit_card" } }
   let(:invalid_payment_params) { { invoice_id: nil, amount: nil, payment_method: nil } }

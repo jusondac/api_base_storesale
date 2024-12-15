@@ -1,4 +1,5 @@
 require 'rails_helper'
+require 'faker'
 
 RSpec.describe 'Customers API', type: :request do
   let(:user) { create(:user) }
@@ -15,7 +16,7 @@ RSpec.describe 'Customers API', type: :request do
   end
 
   describe 'POST /customers' do
-    let(:valid_attributes) { { name: 'Jane Doe', email: 'jane@example.com', phone: '1234567890' } }
+    let(:valid_attributes) { { name: 'Jane Doe', email: 'jane@example.com', phone: '1234567890'} }
 
     context 'when the request is valid' do
       it 'creates a customer' do

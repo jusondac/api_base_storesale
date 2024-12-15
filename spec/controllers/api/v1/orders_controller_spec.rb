@@ -8,6 +8,7 @@ RSpec.describe 'Orders API', type: :request do
   let(:product) { create(:product, price: 100) }
   let!(:stock) { create(:stock, product: product, quantity: 100, last_updated_at: 1.day.ago) }
   let!(:customer) { create(:customer, name: 'John Doe', email: 'john@example.com') }
+  let!(:shipping) { create(:shipping, customer: customer) }
   let!(:order) { create(:order, customer: customer) }
 
 
@@ -50,7 +51,8 @@ RSpec.describe 'Orders API', type: :request do
             status: "pending",
             order_items: [
               { product_id: product.id, quantity: 2 }
-            ]
+            ],
+            shipping_id: shipping.id
           }
         }
       end

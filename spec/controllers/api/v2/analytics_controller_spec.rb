@@ -21,26 +21,26 @@ RSpec.describe "Analytics API", type: :request do
   end
   
 
-  describe 'GET /api/v2/analytics' do
+  describe 'GET /api/v2/analytics/simple_analytics' do
     let(:headers) { { 'Authorization' => "Bearer #{JsonWebToken.encode(user_id: user.id)}" } }
 
     context 'when authenticated' do
       it 'returns total revenue' do
-        get '/api/v2/analytics', headers: headers
+        get '/api/v2/analytics/simple_analytics', headers: headers
         expect(response).to have_http_status(:ok)
         json_response = JSON.parse(response.body)
         expect(json_response['total_revenue']).to eq('300.0')
       end
 
       it 'returns best-selling products' do
-        get '/api/v2/analytics', headers: headers
+        get '/api/v2/analytics/simple_analytics', headers: headers
         json_response = JSON.parse(response.body)
         best_selling = json_response['best_selling_products']
         expect(best_selling).to include(a_hash_including('name' => product2.name, 'total_quantity' => 10))
       end
 
       it 'returns customer lifetime value' do
-        get '/api/v2/analytics', headers: headers
+        get '/api/v2/analytics/simple_analytics', headers: headers
         json_response = JSON.parse(response.body)
         clv = json_response['customer_lifetime_value'].first
         expect(clv['name']).to eq(customer.name)
@@ -48,13 +48,13 @@ RSpec.describe "Analytics API", type: :request do
       end
 
       it 'returns sales by day' do
-        get '/api/v2/analytics', headers: headers
+        get '/api/v2/analytics/simple_analytics', headers: headers
         json_response = JSON.parse(response.body)
         expect(json_response['sales_by_day']).to include(a_hash_including('total_price' => "100.0"))
       end
 
       it 'returns storefront performance' do
-        get '/api/v2/analytics', headers: headers
+        get '/api/v2/analytics/simple_analytics', headers: headers
         json_response = JSON.parse(response.body)
         performance = json_response['storefront_performance'].first
         expect(performance['name']).to eq(storefront.name)
@@ -64,7 +64,7 @@ RSpec.describe "Analytics API", type: :request do
 
     context 'when unauthenticated' do
       it 'returns unauthorized error' do
-        get '/api/v2/analytics'
+        get '/api/v2/analytics/simple_analytics'
         expect(response).to have_http_status(:unauthorized)
         expect(JSON.parse(response.body)).to include("error" => "Unauthorized")
       end
