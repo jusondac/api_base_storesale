@@ -5,4 +5,5 @@ class User < ApplicationRecord
     validates :password, presence: true, length: { minimum: 6 }, if: :password
 
     has_many :storefronts, dependent: :destroy
+    has_many :products, through: :storefronts
 end
