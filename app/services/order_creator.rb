@@ -8,8 +8,9 @@ class OrderCreator
   # @param items [Array<Hash>] array of items with :product_id, :quantity, and :unit_price
   # @return [Order] the created order
   # @raise [OrderCreationError] if order creation fails
-  def self.create_order(customer:, items:, shipping:)
-    new.create_order(customer: customer, items: items, shipping: shipping)
+  def self.create_order(user:, items:, shipping:)
+    raise OrderCreationError, "User must be a customer" unless user.customer?
+    new.create_order(user: user, items: items, shipping: shipping)
   end
 
   # @param product_id [Integer] the ID of the product to update
