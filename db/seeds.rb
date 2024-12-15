@@ -12,41 +12,69 @@ Restock.destroy_all
 Product.destroy_all
 Category.destroy_all
 Shipping.destroy_all
-Customer.destroy_all
 Supplier.destroy_all
 Storefront.destroy_all
 User.destroy_all
 Employee.destroy_all
 
-puts "Creating users..."
-5.times do
-  User.create!(
-    email: Faker::Internet.unique.email,
-    password_digest: BCrypt::Password.create('password123')
+puts "Creating master..."
+users = []
+1.times do
+  user = User.create!(
+    email: "master@gmail1.com",
+    password_digest: BCrypt::Password.create('password123'),
+    phone: Faker::PhoneNumber.phone_number,
+    name: Faker::Name.name,
+    role: 0
   )
+  users << user
 end
 
-puts "Creating employees..."
-10.times do
-  Employee.create!(
+puts "Creating admins..."
+admins = []
+5.times do
+  admin = User.create!(
+    email: Faker::Internet.unique.email,
+    password_digest: BCrypt::Password.create('password123'),
+    phone: Faker::PhoneNumber.phone_number,
     name: Faker::Name.name,
-    role: ['Manager', 'Sales', 'Support', 'Admin'].sample,
-    email: Faker::Internet.unique.email
+    role: 1
   )
+  admins << admin
 end
+
+puts "Creating customer..."
+customers = []
+50.times do
+  customer = User.create!(
+    email: Faker::Internet.unique.email,
+    password_digest: BCrypt::Password.create('password123'),
+    phone: Faker::PhoneNumber.phone_number,
+    name: Faker::Name.name,
+    role: 2
+  )
+  rand(2..3).times do
+    Shipping.create!(
+      customer_id: customer.id,
+      title: ['Home', 'Office', 'Secondary'].sample,
+      address: Faker::Address.full_address
+    )
+  end
+  customers << customer
+end
+
 
 puts "Creating suppliers..."
 8.times do
   Supplier.create!(
     name: Faker::Company.name,
     email: Faker::Internet.email,
-    phone_number: Faker::PhoneNumber.phone_number,
-    address: Faker::Address.full_address
+    phone_number: Faker::PhoneNumber.phone_number
   )
 end
 
 puts "Creating storefronts..."
-User.all.each do |user|
+admins.each do |user|
   2.times do
     Storefront.create!(
       name: Faker::Company.name,
@@ -96,26 +124,9 @@ Product.all.each do |product|
   end
 end
 
-puts "Creating customers..."
-20.times do
-  customer = Customer.create!(
-    name: Faker::Name.name,
-    email: Faker::Internet.unique.email,
-    phone: Faker::PhoneNumber.phone_number
-  )
-  
-  # Create 2-3 shipping addresses for each customer
-  rand(2..3).times do
-    Shipping.create!(
-      customer_id: customer.id,
-      title: ['Home', 'Office', 'Secondary'].sample,
-      address: Faker::Address.full_address
-    )
-  end
-end
 
 puts "Creating orders..."
-Customer.all.each do |customer|
+customers.each do |customer|
   rand(10..20).times do
     order = Order.create!(
       customer: customer,

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_12_15_120809) do
+ActiveRecord::Schema[8.0].define(version: 2024_12_15_135116) do
   create_table "categories", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
@@ -57,11 +57,11 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_15_120809) do
   end
 
   create_table "orders", force: :cascade do |t|
-    t.integer "customer_id", null: false
     t.decimal "total_price"
     t.string "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "customer_id"
     t.index ["customer_id"], name: "index_orders_on_customer_id"
   end
 
@@ -100,11 +100,11 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_15_120809) do
   end
 
   create_table "shippings", force: :cascade do |t|
-    t.integer "customer_id", null: false
     t.string "address"
     t.string "title"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "customer_id"
     t.index ["customer_id"], name: "index_shippings_on_customer_id"
   end
 
@@ -141,7 +141,10 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_15_120809) do
     t.string "password_digest"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "role"
+    t.integer "role", default: 2
+    t.string "name"
+    t.string "phone"
+    t.boolean "verified", default: false
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 
@@ -149,13 +152,13 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_15_120809) do
   add_foreign_key "invoices", "shippings"
   add_foreign_key "order_items", "orders"
   add_foreign_key "order_items", "products"
-  add_foreign_key "orders", "customers"
+  add_foreign_key "orders", "users", column: "customer_id"
   add_foreign_key "payments", "invoices"
   add_foreign_key "products", "categories"
   add_foreign_key "products", "storefronts"
   add_foreign_key "restocks", "products"
   add_foreign_key "restocks", "suppliers"
-  add_foreign_key "shippings", "customers"
+  add_foreign_key "shippings", "users", column: "customer_id"
   add_foreign_key "stocks", "products"
   add_foreign_key "storefronts", "users"
 end
