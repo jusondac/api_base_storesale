@@ -21,7 +21,7 @@ class Api::V1::AuthController < ApplicationController
         render json: { error: 'Invalid email or password' }, status: :unauthorized
       end
     end
-  
+    
     # Auto Login (optional, validates token)
     def auto_login
       render json: { user: @current_user }, status: :ok

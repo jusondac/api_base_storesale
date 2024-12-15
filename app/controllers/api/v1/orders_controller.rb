@@ -39,7 +39,8 @@ module Api
             }
           end
           customer = Customer.find(order_params[:customer_id])
-          @order = OrderCreator.create_order(customer: customer, items: items)
+          shipping = Shipping.find(order_params[:shipping_id])
+          @order = OrderCreator.create_order(customer: customer, items: items, shipping: shipping)
           render json: @order, status: :created
         rescue => e
           render json: { errors: e.message }, status: :unprocessable_entity
@@ -49,8 +50,9 @@ module Api
         private
   
         def order_params
-          params.require(:order).permit(:customer_id, :status, order_items: [:product_id, :quantity])
+          params.require(:order).permit(:customer_id, :status, :shipping_id, order_items: [:product_id, :quantity])
         end
+        
       end
     end
   end

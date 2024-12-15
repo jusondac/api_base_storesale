@@ -1,7 +1,6 @@
-class Api::V2::AnalyticsController < ApplicationController
+class Api::V2::Analytics::SimpleAnalyticsController < ApplicationController
   def index
-    analytics = SalesAnalyticsService.new(start_date: params[:start_date], end_date: params[:end_date])
-
+    analytics = Analytics::SalesAnalyticsService.new(start_date: params[:start_date], end_date: params[:end_date])
     render json: {
       total_revenue: analytics.total_revenue,
       best_selling_products: analytics.best_selling_products,
