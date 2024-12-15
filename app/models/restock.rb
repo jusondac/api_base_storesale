@@ -1,12 +1,14 @@
-# class Restock < ApplicationRecord {
-#               :id => :integer,
-#       :product_id => :integer,
-#         :quantity => :integer,
-#     :restocked_at => :datetime,
-#      :supplier_id => :integer,
-#       :created_at => :datetime,
-#       :updated_at => :datetime
-# }
+# == Schema Information
+#
+# Table name: restocks
+#
+#  id         :bigint           not null, primary key
+#  product_id :bigint           not null
+#  supplier_id:bigint           not null
+#  quantity   :integer          not null
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#
 class Restock < ApplicationRecord
   belongs_to :product
   belongs_to :supplier
