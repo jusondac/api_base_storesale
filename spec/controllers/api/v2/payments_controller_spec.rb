@@ -5,8 +5,7 @@ RSpec.describe "Payments API", type: :request do
   let(:auth_token) { JsonWebToken.encode(user_id: user.id) }
   let(:headers) { { "Authorization" => "Bearer #{auth_token}", "Content-Type" => "application/json" } }
 
-  let(:customer) { create(:customer) } # Assuming a customer factory exists
-  let(:shipping) { create(:shipping, customer: customer) } # Assuming a shipping factory exists
+  let(:shipping) { create(:shipping, customer: user) } # Assuming a shipping factory exists
   let(:invoice) { create(:invoice) } # Assuming an invoice factory exists
   let(:valid_payment_params) { { invoice_id: invoice.id, amount: 100.50, status: "completed", payment_method: "credit_card" } }
   let(:invalid_payment_params) { { invoice_id: nil, amount: nil, payment_method: nil } }
@@ -19,7 +18,7 @@ RSpec.describe "Payments API", type: :request do
     end
 
     it 'return not authorize' do
-      get '/api/v2/payments', params: valid_payment_params.to_json
+      get '/api/v2/payments'
       expect(response).to have_http_status(:unauthorized)
       expect(JSON.parse(response.body)).to include("error" => "Unauthorized")
     end
@@ -29,7 +28,6 @@ RSpec.describe "Payments API", type: :request do
     context "with valid parameters" do
       it "creates a payment and updates the invoice status" do
         post '/api/v2/payments', params: valid_payment_params.to_json, headers: headers
-
         expect(response).to have_http_status(:created)
         expect(JSON.parse(response.body)).to include("message" => "Payment successful")
       end

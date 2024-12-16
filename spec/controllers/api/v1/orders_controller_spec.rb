@@ -7,7 +7,8 @@ RSpec.describe 'Orders API', type: :request do
   
   let(:product) { create(:product, price: 100) }
   let!(:stock) { create(:stock, product: product, quantity: 100, last_updated_at: 1.day.ago) }
-  let!(:customer) { create(:customer, name: 'John Doe', email: 'john@example.com') }
+  # let!(:customer) { create(:customer, name: 'John Doe', email: 'john@example.com') }
+  let!(:customer) { create(:user, name: 'John Doe', email: 'john@example.com', role: 2) }
   let!(:shipping) { create(:shipping, customer: customer) }
   let!(:order) { create(:order, customer: customer) }
 
@@ -119,7 +120,7 @@ RSpec.describe 'Orders API', type: :request do
 
         expect(response).to have_http_status(:unprocessable_entity)
         response_body = JSON.parse(response.body)
-        expect(response_body['errors']).to match(/Couldn't find Customer/)
+        expect(response_body['errors']).to match("Couldn't find User with 'id'=999")
       end
     end
   end

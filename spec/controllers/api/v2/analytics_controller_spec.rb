@@ -1,17 +1,16 @@
 require 'rails_helper'
 
 RSpec.describe "Analytics API", type: :request do
-  let(:user) { create(:user) }
+  let(:user) { create(:user, role: 2) }
   let(:storefront) { create(:storefront, user: user) }
-  let(:customer) { create(:customer) }
   let(:order_item) { create(:order_item) }
   let(:product1) { create(:product, storefront: storefront) }
   let(:product2) { create(:product, storefront: storefront) }
   let(:order1) do
-    create(:order, customer: customer, total_price: 100.0, status: 'completed', created_at: 1.day.ago)
+    create(:order, customer: user, total_price: 100.0, status: 'completed', created_at: 1.day.ago)
   end
   let(:order2) do
-    create(:order, customer: customer, total_price: 200.0, status: 'completed', created_at: 3.days.ago)
+    create(:order, customer: user, total_price: 200.0, status: 'completed', created_at: 3.days.ago)
   end
 
   before do
@@ -43,7 +42,7 @@ RSpec.describe "Analytics API", type: :request do
         get '/api/v2/analytics/simple_analytics', headers: headers
         json_response = JSON.parse(response.body)
         clv = json_response['customer_lifetime_value'].first
-        expect(clv['name']).to eq(customer.name)
+        expect(clv['name']).to eq(user.name)
         expect(clv['lifetime_value']).to eq(300.0)
       end
 
