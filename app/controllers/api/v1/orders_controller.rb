@@ -24,7 +24,7 @@ module Api
   
         def new
           @order = Order.new
-          @customers = Customer.select(:id, :name, :email)
+          @customers = User.select(:id, :name, :email)
           @products = Product.select(:id, :name, :price)
           render json: { order: @order, customers: @customers, products: @products }
         end
@@ -38,7 +38,7 @@ module Api
               unit_price: Product.find(item[:product_id]).price
             }
           end
-          customer = Customer.find(order_params[:customer_id])
+          customer = User.find(order_params[:customer_id])
           shipping = Shipping.find(order_params[:shipping_id])
           @order = OrderCreator.create_order(customer: customer, items: items, shipping: shipping)
           render json: @order, status: :created
