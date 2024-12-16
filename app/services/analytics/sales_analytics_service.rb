@@ -18,9 +18,9 @@ class Analytics::SalesAnalyticsService
   end
 
   def customer_lifetime_value
-    Customer.joins(:orders)
-            .select('customers.name, SUM(orders.total_price) as lifetime_value')
-            .group('customers.id')
+    User.joins(:orders)
+            .select('users.name, SUM(orders.total_price) as lifetime_value')
+            .group('users.id')
             .order('lifetime_value DESC')
   end
 
