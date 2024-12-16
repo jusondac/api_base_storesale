@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :shipping do
-    customer
     address { Faker::Address.full_address }
     title { "Home" }
+    association :customer, factory: :user
   end
 end
