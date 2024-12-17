@@ -28,7 +28,7 @@ RSpec.describe "Analytics API", type: :request do
         get '/api/v2/analytics/simple_analytics', headers: headers
         expect(response).to have_http_status(:ok)
         json_response = JSON.parse(response.body)
-        expect(json_response['total_revenue']).to eq('300.0')
+        expect(json_response['total_revenue']).to eq(300.0)
       end
 
       it 'returns best-selling products' do
@@ -49,7 +49,7 @@ RSpec.describe "Analytics API", type: :request do
       it 'returns sales by day' do
         get '/api/v2/analytics/simple_analytics', headers: headers
         json_response = JSON.parse(response.body)
-        expect(json_response['sales_by_day']).to include(a_hash_including('total_price' => "100.0"))
+        expect(json_response['sales_by_day']).to include(a_hash_including('total_price' => 100.0))
       end
 
       it 'returns storefront performance' do
