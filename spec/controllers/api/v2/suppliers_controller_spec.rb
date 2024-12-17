@@ -2,6 +2,7 @@ require 'rails_helper'
 
 RSpec.describe 'Suppliers API', type: :request do
   let(:user) { create(:user) }
+  let(:vendor) { create(:user, role: 3) }
   let(:token) { JsonWebToken.encode(user_id: user.id) }
   let(:headers) { { 'Content-Type' => 'application/json', 'Authorization' => "Bearer #{token}" } }
 
@@ -21,7 +22,7 @@ RSpec.describe 'Suppliers API', type: :request do
   end
 
   describe 'POST /api/v2/suppliers' do
-    let(:valid_attributes) { { name: 'Jane Doe', email: 'jane@example.com', phone: '1234567890' } }
+    let(:valid_attributes) { { name: 'Jane Doe', email: 'jane@example.com', phone: '1234567890', owner_id: vendor.id } }
 
     context 'when the request is valid' do
       it 'creates a suppliers' do
