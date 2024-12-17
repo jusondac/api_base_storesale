@@ -16,9 +16,10 @@ class User < ApplicationRecord
     has_many :storefronts, dependent: :destroy
     has_many :products, through: :storefronts
     has_many :orders, foreign_key: 'customer_id', dependent: :destroy
+    has_many :suppliers, dependent: :destroy, foreign_key: 'owner_id'
     has_many :shippings, dependent: :destroy, foreign_key: 'customer_id'
 
-    enum :role, [:master, :admin, :customer]
+    enum :role, [:master, :admin, :customer, :vendor]
     scope :customers, -> { where(role: :customer) }
    
 end
