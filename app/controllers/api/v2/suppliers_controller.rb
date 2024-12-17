@@ -17,6 +17,6 @@ class Api::V2::SuppliersController < ApplicationController
   private
 
   def supplier_params
-    params.require(:supplier).permit(:name, :email, :phone_number, :address)
+    params.require(:supplier).permit(:name, :email, :phone_number, :address, :owner_id)
   end
 end
