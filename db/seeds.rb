@@ -1,23 +1,15 @@
-# This file should contain all the record creation needed to seed the database with its default values.
 require 'faker'
+require 'colorize'
 
 # Clear existing data
-puts "Cleaning database..."
-Payment.destroy_all
-Invoice.destroy_all
-OrderItem.destroy_all
-Order.destroy_all
-Stock.destroy_all
-Restock.destroy_all
-Product.destroy_all
-Category.destroy_all
-Shipping.destroy_all
-Supplier.destroy_all
-Storefront.destroy_all
-User.destroy_all
-Employee.destroy_all
+puts "Cleaning database...".yellow.bold
+[Payment, Invoice, OrderItem, Order, Stock, Restock, Product, Category, Shipping, Supplier, Storefront, User, Employee].each do |model|
+  print "  - Clearing #{model.name}... ".light_red
+  model.destroy_all
+  puts "done!".green
+end
 
-puts "Creating master..."
+puts "\nCreating master user...".yellow.bold
 users = []
 1.times do
   user = User.create!(
@@ -27,12 +19,13 @@ users = []
     name: Faker::Name.name,
     role: 0
   )
+  puts "  - Master user created: #{user.email}".green
   users << user
 end
 
-puts "Creating admins..."
+puts "\nCreating admins...".yellow.bold
 admins = []
-5.times do
+5.times do |i|
   admin = User.create!(
     email: Faker::Internet.unique.email,
     password_digest: BCrypt::Password.create('password123'),
@@ -40,12 +33,27 @@ admins = []
     name: Faker::Name.name,
     role: 1
   )
+  puts "  - Admin ##{i + 1} created: #{admin.email}".green
   admins << admin
 end
 
-puts "Creating customer..."
+puts "\nCreating vendors...".yellow.bold
+vendors = []
+5.times do |i|
+  vendor = User.create!(
+    email: Faker::Internet.unique.email,
+    password_digest: BCrypt::Password.create('password123'),
+    phone: Faker::PhoneNumber.phone_number,
+    name: Faker::Name.name,
+    role: 3
+  )
+  puts "  - Vendor ##{i + 1} created: #{vendor.email}".green
+  vendors << vendor
+end
+
+puts "\nCreating customers and shippings...".yellow.bold
 customers = []
-50.times do
+50.times do |i|
   customer = User.create!(
     email: Faker::Internet.unique.email,
     password_digest: BCrypt::Password.create('password123'),
@@ -53,6 +61,7 @@ customers = []
     name: Faker::Name.name,
     role: 2
   )
+  puts "  - Customer ##{i + 1} created: #{customer.email}".green
   rand(2..3).times do
     Shipping.create!(
       customer_id: customer.id,
@@ -63,78 +72,82 @@ customers = []
   customers << customer
 end
 
-
-puts "Creating suppliers..."
-8.times do
-  Supplier.create!(
+puts "\nCreating suppliers from vendors...".yellow.bold
+vendors.each_with_index do |vendor, i|
+  supplier = Supplier.create!(
     name: Faker::Company.name,
-    email: Faker::Internet.email,
-    phone_number: Faker::PhoneNumber.phone_number
+    email: vendor.email,
+    phone_number: vendor.phone,
+    owner: vendor
   )
+  puts "  - Supplier ##{i + 1} created: #{supplier.name}".green
 end
 
-puts "Creating storefronts..."
-admins.each do |user|
-  2.times do
-    Storefront.create!(
+puts "\nCreating storefronts...".yellow.bold
+admins.each_with_index do |admin, i|
+  2.times do |j|
+    storefront = Storefront.create!(
       name: Faker::Company.name,
-      user: user,
+      user: admin,
       address: Faker::Address.street_address,
-      city: Faker::Address.city
+      city: Faker::Address.city,
+      margin: rand(0.5..0.6)
     )
+    puts "  - Storefront ##{i * 2 + j + 1} created: #{storefront.name}".green
   end
 end
 
-puts "Creating categories..."
-categories = ['Electronics', 'Clothing', 'Books', 'Home & Garden', 'Sports'].map do |name|
-  Category.create!(name: name)
+puts "\nCreating categories...".yellow.bold
+categories = ['Electronics', 'Clothing', 'Books', 'Home & Garden', 'Sports'].map.with_index do |name, i|
+  category = Category.create!(name: name)
+  puts "  - Category ##{i + 1} created: #{category.name}".green
+  category
 end
 
-puts "Creating products..."
-Storefront.all.each do |storefront|
-  rand(5..10).times do
-    Product.create!(
+puts "\nCreating products and stocks...".yellow.bold
+Storefront.all.each_with_index do |storefront, i|
+  rand(5..10).times do |j|
+    cost = Faker::Commerce.price(range: 10.0..100.0)
+    price = (cost * (1 + storefront.margin)).round(2)
+    product = Product.create!(
       name: Faker::Commerce.product_name,
-      price: Faker::Commerce.price(range: 10.0..1000.0),
+      price: price,
+      cost: cost,
       quantity: rand(0..100),
       category: categories.sample,
       storefront: storefront
     )
+    Stock.create!(
+      product: product,
+      quantity: rand(10..100),
+      last_updated_at: Faker::Time.between(from: 1.month.ago, to: Time.current)
+    )
+    puts "  - Product ##{i + j + 1} created: #{product.name} ($#{product.price})".green
   end
 end
 
-puts "Creating stocks..."
-Product.all.each do |product|
-  Stock.create!(
-    product: product,
-    quantity: rand(10..100),
-    last_updated_at: Faker::Time.between(from: 1.month.ago, to: Time.current)
-  )
-end
-
-puts "Creating restocks..."
-Product.all.each do |product|
-  rand(1..3).times do
+puts "\nCreating restocks...".yellow.bold
+Product.all.each_with_index do |product, i|
+  rand(1..3).times do |j|
     Restock.create!(
       product: product,
       supplier: Supplier.all.sample,
       quantity: rand(10..50),
       restocked_at: Faker::Time.between(from: 6.months.ago, to: Time.current)
     )
+    puts "  - Restock for Product ##{i + 1} (#{product.name}) added".green
   end
 end
 
-
-puts "Creating orders..."
-customers.each do |customer|
-  rand(10..20).times do
+puts "\nCreating orders, invoices, and payments...".yellow.bold
+customers.each_with_index do |customer, i|
+  rand(10..20).times do |j|
     order = Order.create!(
       customer: customer,
       status: %w[pending completed canceled processing].sample,
-      total_price: 0  # Will be updated after adding order items
+      total_price: 0
     )
 
-    # Create order items
     rand(1..5).times do
       product = Product.all.sample
       quantity = rand(1..5)
@@ -146,11 +159,11 @@ customers.each do |customer|
       )
     end
 
-    # Update order total price
     total = order.order_items.sum { |item| item.quantity * item.unit_price }
     order.update!(total_price: total)
 
-    # Create invoice for completed orders
+    puts "  - Order ##{i * 10 + j + 1} created - #{customer.email} - #{order.status}".green
+
     if order.status == 'completed'
       invoice = Invoice.create!(
         order: order,
@@ -159,8 +172,8 @@ customers.each do |customer|
         total_amount: total,
         due_date: Faker::Time.between(from: Time.current, to: 30.days.from_now)
       )
+      puts "    - Invoice created: #{invoice.status} - Amount $#{invoice.total_amount}".blue
 
-      # Create payment for paid invoices
       if invoice.status == 'paid'
         Payment.create!(
           invoice: invoice,
@@ -169,9 +182,10 @@ customers.each do |customer|
           payment_method: ['credit_card', 'debit_card', 'bank_transfer'].sample,
           status: :completed
         )
+        puts "      - Payment completed - invoice_id ##{invoice.id}".cyan
       end
     end
   end
 end
 
-puts "Seeding completed!"
+puts "\nSeeding completed successfully!".green.bold

@@ -91,6 +91,7 @@ GEM
     byebug (11.1.3)
     case_transform (0.2)
       activesupport
+    colorize (1.1.0)
     concurrent-ruby (1.3.4)
     connection_pool (2.4.1)
     crass (1.0.6)
@@ -274,6 +275,7 @@ DEPENDENCIES
   bootsnap
   brakeman
   byebug (~> 11.1)
+  colorize (~> 1.1)
   debug
   factory_bot_rails
   faker (~> 3.5)

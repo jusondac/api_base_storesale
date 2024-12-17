@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_12_15_135116) do
+ActiveRecord::Schema[8.0].define(version: 2024_12_17_040026) do
   create_table "categories", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
@@ -49,7 +49,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_15_135116) do
     t.integer "order_id", null: false
     t.integer "product_id", null: false
     t.integer "quantity"
-    t.decimal "unit_price"
+    t.float "unit_price"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["order_id"], name: "index_order_items_on_order_id"
@@ -57,7 +57,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_15_135116) do
   end
 
   create_table "orders", force: :cascade do |t|
-    t.decimal "total_price"
+    t.float "total_price"
     t.string "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -84,6 +84,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_15_135116) do
     t.datetime "updated_at", null: false
     t.integer "category_id"
     t.integer "storefront_id"
+    t.float "cost"
     t.index ["category_id"], name: "index_products_on_category_id"
     t.index ["storefront_id"], name: "index_products_on_storefront_id"
   end
@@ -124,6 +125,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_15_135116) do
     t.string "city"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.float "margin"
     t.index ["user_id"], name: "index_storefronts_on_user_id"
   end
 
@@ -134,6 +136,8 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_15_135116) do
     t.text "address"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "owner_id"
+    t.index ["owner_id"], name: "index_suppliers_on_owner_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -161,4 +165,5 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_15_135116) do
   add_foreign_key "shippings", "users", column: "customer_id"
   add_foreign_key "stocks", "products"
   add_foreign_key "storefronts", "users"
+  add_foreign_key "suppliers", "users", column: "owner_id"
 end
