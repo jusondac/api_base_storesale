@@ -15,6 +15,10 @@ class Order < ApplicationRecord
   validates :total_price, numericality: { greater_than_or_equal_to: 0 }
   validates :status, inclusion: { in: %w[pending completed canceled processing] }
 
+  scope :completed, -> { where(status: 'completed') }
+  scope :pending, -> { where(status: 'pending') }
+  scope :canceled, -> { where(status: 'canceled') }
+  scope :processing, -> { where(status: 'processing') }
   # Calculate total revenue for a specific storefront through the orders' products
   scope :total_revenue, ->(storefront_id) {
     joins(products: :storefront)
@@ -22,8 +26,6 @@ class Order < ApplicationRecord
       .select('storefronts.*, SUM(orders.total_price) as total_revenue')
       .group('storefronts.id')
   }
-  scope :completed, -> { where(status: 'completed') }
-  scope :pending, -> { where(status: 'pending') }
-  scope :canceled, -> { where(status: 'canceled') }
-  scope :processing, -> { where(status: 'processing') }
+  
+  
 end
