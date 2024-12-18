@@ -10,7 +10,23 @@ class Storefront < ApplicationRecord
 
   def owner;user;end
 
-  def products_sold
-    order_items.map(&:product).uniq
-  end
+  scope :with_completed_orders, -> {
+    joins(products: { order_items: :order })
+      .where(orders: { status: 'completed' })
+      .distinct
+  }
+  scope :profit_margin, -> {
+    joins(products: :order_items)
+      .select('storefronts.*, 
+        SUM(order_items.quantity * (products.price - products.cost)) as total_profit,
+        SUM(order_items.quantity * products.price) as total_revenue,
+        (SUM(order_items.quantity * (products.price - products.cost)) / 
+         NULLIF(SUM(order_items.quantity * products.price), 0) * 100.0) as margin_percentage')
+      .group('storefronts.id')
+  }
+  scope :total_revenue, -> {
+    joins(products: :order_items)
+      .select('storefronts.*, SUM(order_items.quantity * products.price) as total_revenue')
+      .group('storefronts.id')
+  }
 end
