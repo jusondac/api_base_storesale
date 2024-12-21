@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_12_17_040026) do
+ActiveRecord::Schema[8.0].define(version: 2024_12_21_063445) do
   create_table "categories", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
@@ -23,6 +23,17 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_17_040026) do
     t.string "phone"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "discounts", force: :cascade do |t|
+    t.string "code"
+    t.integer "percentage"
+    t.datetime "start_date"
+    t.datetime "end_date"
+    t.integer "storefront_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["storefront_id"], name: "index_discounts_on_storefront_id"
   end
 
   create_table "employees", force: :cascade do |t|
@@ -43,6 +54,15 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_17_040026) do
     t.integer "shipping_id"
     t.index ["order_id"], name: "index_invoices_on_order_id"
     t.index ["shipping_id"], name: "index_invoices_on_shipping_id"
+  end
+
+  create_table "order_discounts", force: :cascade do |t|
+    t.integer "order_id", null: false
+    t.integer "discount_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["discount_id"], name: "index_order_discounts_on_discount_id"
+    t.index ["order_id"], name: "index_order_discounts_on_order_id"
   end
 
   create_table "order_items", force: :cascade do |t|
@@ -152,8 +172,11 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_17_040026) do
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 
+  add_foreign_key "discounts", "storefronts"
   add_foreign_key "invoices", "orders"
   add_foreign_key "invoices", "shippings"
+  add_foreign_key "order_discounts", "discounts"
+  add_foreign_key "order_discounts", "orders"
   add_foreign_key "order_items", "orders"
   add_foreign_key "order_items", "products"
   add_foreign_key "orders", "users", column: "customer_id"

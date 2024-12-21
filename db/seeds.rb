@@ -1,9 +1,25 @@
-require 'faker'
-require 'colorize'
+# require 'faker'
+# require 'colorize'
 
-# Clear existing data
+# # Clear existing data
 puts "Cleaning database...".yellow.bold
-[Payment, Invoice, OrderItem, Order, Stock, Restock, Product, Category, Shipping, Supplier, Storefront, User, Employee].each do |model|
+[
+  Payment, 
+  Invoice,
+  OrderItem, 
+  Discount,
+  OrderDiscount,
+  Order, 
+  Stock, 
+  Restock, 
+  Product, 
+  Category, 
+  Shipping, 
+  Supplier, 
+  Storefront, 
+  User, 
+  Employee
+].each do |model|
   print "  - Clearing #{model.name}... ".light_red
   model.destroy_all
   puts "done!".green
@@ -23,6 +39,7 @@ users = []
   users << user
 end
 
+# Create employees
 puts "\nCreating admins...".yellow.bold
 admins = []
 5.times do |i|
@@ -37,6 +54,7 @@ admins = []
   admins << admin
 end
 
+# Create vendors
 puts "\nCreating vendors...".yellow.bold
 vendors = []
 5.times do |i|
@@ -53,7 +71,7 @@ end
 
 puts "\nCreating customers and shippings...".yellow.bold
 customers = []
-50.times do |i|
+10.times do |i|
   customer = User.create!(
     email: Faker::Internet.unique.email,
     password_digest: BCrypt::Password.create('password123'),
@@ -139,6 +157,21 @@ Product.all.each_with_index do |product, i|
   end
 end
 
+# Discounts
+puts "\nCreating discounts...".yellow.bold
+
+Storefront.all.each do |storefront|
+  print "  - Creating discount... ".light_red
+  discount = Discount.create!(
+    code: Faker::Commerce.promotion_code,
+    percentage: Faker::Number.between(from: 5, to: 50),
+    start_date: Time.now - Faker::Number.between(from: 1, to: 10).days,
+    end_date: Time.now + Faker::Number.between(from: 10, to: 30).days,
+    storefront_id: storefront.id
+  )
+  puts "#{discount.code}:#{discount.storefront.name} done!".green
+end
+
 puts "\nCreating orders, invoices, and payments...".yellow.bold
 customers.each_with_index do |customer, i|
   rand(10..20).times do |j|
@@ -186,6 +219,17 @@ customers.each_with_index do |customer, i|
       end
     end
   end
+end
+
+# Order Discounts
+puts "\nCreating order discounts...".yellow.bold
+Order.all.each do |order|
+  print "  - Creating order discount... ".light_red
+  OrderDiscount.create!(
+    order_id: Order.all.sample.id,
+    discount_id: Discount.all.sample.id
+  )
+  puts "done!".green
 end
 
 puts "\nSeeding completed successfully!".green.bold
