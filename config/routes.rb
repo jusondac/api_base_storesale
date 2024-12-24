@@ -3,7 +3,11 @@ Rails.application.routes.draw do
     namespace :v1 do
       resources :products
       resources :categories
-      resources :customers
+      resources :customers do
+        member do
+          get :order_customer
+        end
+      end
       resources :orders do
         resources :order_items, only: [:create, :destroy]
       end

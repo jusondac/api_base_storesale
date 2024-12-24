@@ -57,3 +57,5 @@ gem "active_model_serializers", "~> 0.10.15"
 gem "fast_jsonapi", "~> 1.5"
 
 gem "colorize", "~> 1.1"
+
+gem "hirb", "~> 0.7.3"

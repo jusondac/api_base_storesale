@@ -21,5 +21,4 @@ class User < ApplicationRecord
 
     enum :role, [:master, :admin, :customer, :vendor]
     scope :customers, -> { where(role: :customer) }
-   
 end
