@@ -40,68 +40,95 @@ module ConsoleMethods
   
   def all_controller_names
     Rails.application.eager_load!
-    controllers           = ApplicationController.descendants.map(&:name)
-    routes                = Rails.application.routes.routes
-    collected_controllers = []
+    
+    controllers = ApplicationController.descendants.map(&:name)
+    routes = Rails.application.routes.routes
+  
     controllers.map do |controller|
-      controller_class  = controller.constantize.new
-      controller_name   = controller.split('::').last.gsub('sController', '').underscore
-      params_method     = "#{controller_name}_params".to_sym
-      source_location   = file_location = permitted_params = nil
-
-      begin
-        source_location   = controller_class.method(params_method).source_location
-        file_location     = File.read(source_location[0]).lines[source_location[1] - 1, 10].join.gsub(/\s+/, ' ').strip
-        permitted_params  = file_location.scan(/:(\w+)/).flatten.map(&:to_sym)
-      rescue NameError
-      # Handle the case where the method is not found
-        source_location   = file_location = permitted_params = "undefined"
-      end
-
-      controller_routes   = routes.select do |route|
-        (route.defaults[:controller]).to_s.include?(controller_name) && route.verb.present?
-      end
-      
-      controller_routes   = controller_routes.map do |route|
-        {
-          verb: route.verb,
-          path: route.path.spec.to_s,
-          action: route.defaults[:action]
-        }
-      end
-
-      collected_controllers << {
-        controller: controller_name,
-        params_method: params_method,
-        permitted_params: permitted_params,
+      {
+        controller: extract_controller_name(controller),
+        params_method: fetch_params_method_name(controller),
+        permitted_params: fetch_permitted_params(controller),
         additional_info: {
-          controller_class: controller_class.class.name,
-          method_defined: controller_class.respond_to?(params_method),
-          method_visibility: controller_class.private_methods.include?(params_method) ? 'private' : 'public',
-          routes: controller_routes
+          controller_class: fetch_controller_class(controller),
+          method_defined: method_defined?(controller),
+          method_visibility: method_visibility(controller),
+          routes: fetch_controller_routes(controller, routes)
         }
       }
     end
-    collected_controllers
   end
   
   private
   
-  def fetch_permitted_params(controller_class, action)
-    strong_params_method = "#{action}_params"
+  # Extract the controller name from the full class name
+  def extract_controller_name(controller)
+    controller.split('::').last.gsub('sController', '').underscore
+  end
   
-    if controller_class.private_instance_methods.include?(strong_params_method.to_sym)
-      # Instantiate the controller to call the strong parameters method
-      controller_instance = controller_class.new
-      begin
-        sample_params = ActionController::Parameters.new({ example: { key: "value" } })
-        permitted = controller_instance.send(strong_params_method, sample_params)
-        permitted.keys
-      rescue StandardError => e
-        "Error fetching permitted params: #{e.message}"
-      end
-    else
-      "No strong parameters method defined for action '#{action}'"
+  # Generate the params method name
+  def fetch_params_method_name(controller)
+    "#{extract_controller_name(controller)}_params".to_sym
+  end
+  
+  # Fetch the permitted parameters for the controller
+  def fetch_permitted_params(controller)
+    controller_class = instantiate_controller(controller)
+    params_method = fetch_params_method_name(controller)
+  
+    begin
+      source_location = controller_class.method(params_method).source_location
+      file_content = File.read(source_location[0])
+      extract_permitted_params(file_content, source_location[1])
+    rescue NameError
+      "undefined"
+    end
+  end
+  
+  # Extract permitted parameters from the source file content
+  def extract_permitted_params(file_content, start_line)
+    lines = file_content.lines[start_line - 1, 10].join.gsub(/\s+/, ' ').strip
+    lines.scan(/:(\w+)/).flatten.map(&:to_sym)
+  end
+  
+  # Fetch the class of the controller
+  def fetch_controller_class(controller)
+    instantiate_controller(controller).class.name
+  end
+  
+  # Instantiate the controller class
+  def instantiate_controller(controller)
+    controller.constantize.new
+  end
+  
+  # Check if the params method is defined in the controller
+  def method_defined?(controller)
+    controller_class = instantiate_controller(controller)
+    params_method = fetch_params_method_name(controller)
+    controller_class.respond_to?(params_method)
+  end
+  
+  # Determine the visibility of the params method
+  def method_visibility(controller)
+    controller_class = instantiate_controller(controller)
+    params_method = fetch_params_method_name(controller)
+    controller_class.private_methods.include?(params_method) ? "private" : "public"
+  end
+  
+  # Fetch routes associated with the controller
+  def fetch_controller_routes(controller, routes)
+    controller_name = extract_controller_name(controller)
+    
+    controller_routes = routes.select do |route|
+      route.defaults[:controller].to_s.include?(controller_name) && route.verb.present?
+    end
+    
+    controller_routes.map do |route|
+      {
+        verb: route.verb,
+        path: route.path.spec.to_s,
+        action: route.defaults[:action]
+      }
     end
   end
 end
