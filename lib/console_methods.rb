@@ -67,7 +67,6 @@ module ConsoleMethods
     puts "Error: #{e.message}"
   end
   
-  
   def all_controller_names
     Rails.application.eager_load!
     
