@@ -11,13 +11,13 @@ puts "Cleaning database...".yellow.bold
   OrderDiscount,
   Order, 
   Stock, 
-  Restock, 
-  Product, 
-  Category, 
+  Restock,
+  Product,
+  Category,
   Shipping, 
-  Supplier, 
+  Supplier,
   Storefront, 
-  User, 
+  User,
   Employee
 ].each do |model|
   print "  - Clearing #{model.name}... ".light_red
